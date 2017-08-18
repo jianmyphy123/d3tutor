@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Treemap Layout</title>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+  </head>
+  <body>
+    <script>
+
+      let color = d3.scale.category10();
+
+      let canvas = d3.select('body').append('svg')
+          .attr('width', 500)
+          .attr('height', 500);
+
+      d3.json('data/treeData.json', data => {
+
+          let treemap = d3.layout.treemap()
+              .size([500, 500])
+              .nodes(data);
+
+          let cells = canvas.selectAll('g')
+              .data(treemap)
+              .enter()
+                  .append('g')
+                  .attr('class', 'cell');
+
+          cells.append('rect')
+              .attr('x', d => d.x)
+              .attr('y', d => d.y)
+              .attr('width', d => d.dx)
+              .attr('height', d => d.dy)
+              .attr('fill', d => color(d.children ? null : d.parent.name))
+              .attr('stroke', '#fff');
+
+          cells.append('text')
+              .attr('x', d => d.x + d.dx/2 )
+              .attr('y', d => d.y + d.dy/2 )
+              .attr('text-anchor', 'middle')
+              .text(d => d.children ? null : d.name);
+
+      });
+    </script>
+
+  </body>
+</html>
