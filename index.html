@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Histogram</title>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+  </head>
+  <body>
+    <script>
+
+      let width = 500,
+          height = 500,
+          padding = 50;
+
+      d3.csv('data/ages.csv', data => {
+        let map = data.map(i => parseInt(i.age));
+        let histogram = d3.layout.histogram()
+            .bins(7)
+            (map);
+
+        let y = d3.scale.linear()
+            .domain([0, d3.max(histogram.map(i => i.length))])
+            .range([0, height]);
+
+        let x = d3.scale.linear()
+            .domain([0, d3.max(map)])
+            .range([0, width]);
+
+        let xAxis = d3.svg.axis()
+            .scale(x)
+            .orient('bottom');
+
+        let canvas = d3.select('body').append('svg')
+            .attr('width', width + padding)
+            .attr('height', height + padding)
+            .append('g')
+                .attr('transform', 'translate(20,0)');
+
+        let group = canvas.append('g')
+            .attr('transform', 'translate(0, ' + height + ')')
+            .call(xAxis);
+
+        let bars = canvas.selectAll('.bars')
+            .data(histogram)
+            .enter()
+                .append('g');
+
+        bars.append('rect')
+            .attr('x', d => x(d.x))
+            .attr('y', d => 500 - y(d.y))
+            .attr('width', d => x(d.dx))
+            .attr('height', d => y(d.y))
+            .attr('fill', 'steelblue');
+
+        bars.append('text')
+            .attr('x', d => x(d.x))
+            .attr('y', d => 500 - y(d.y))
+            .attr('dy', '20px')
+            .attr('dx', d => x(d.dx)/2)
+            .attr('fill', '#fff')
+            .attr('text-anchor', 'middle')
+            .text(d => d.y);
+      });
+    </script>
+  </body>
+</html>
